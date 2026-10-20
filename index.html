@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Marks Portal</title><link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<header><div class="brand">🎓 Student Marks Portal</div><nav><a href="#results">Results</a><a href="#admin">Admin Panel</a></nav></header>
+<main>
+<section class="hero"><div><p class="eyebrow">STUDENT PERFORMANCE MANAGER</p><h1>Marks made <span>simple.</span></h1><p class="intro">Add student marks, calculate totals and averages, and view grades in one place.</p><a class="button" href="#results">View results ↓</a></div><div class="hero-card"><div class="big-icon">📊</div><p>Smart score calculation</p><small>Total · Average · Grade</small></div></section>
+<div th:if="${success}" class="notice success" th:text="${success}"></div><div th:if="${error}" class="notice error" th:text="${error}"></div>
+<section id="admin" class="panel">
+<div class="section-heading"><div><p class="eyebrow">ADMINISTRATION</p><h2>Admin panel</h2></div><span class="badge">Add student</span></div>
+<form th:action="@{/admin/students}" th:object="${student}" method="post" class="student-form">
+<label>Student name<input th:field="*{name}" placeholder="e.g. Anjali Sharma" required maxlength="100"></label>
+<label>Roll number<input th:field="*{rollNumber}" placeholder="e.g. 101" required maxlength="30"></label>
+<label>Subject 1 / 100<input type="number" th:field="*{subject1}" min="0" max="100" step="0.01" required></label>
+<label>Subject 2 / 100<input type="number" th:field="*{subject2}" min="0" max="100" step="0.01" required></label>
+<label>Subject 3 / 100<input type="number" th:field="*{subject3}" min="0" max="100" step="0.01" required></label>
+<button class="button submit" type="submit">＋ Add student</button>
+</form>
+<p class="hint">Marks must be between 0 and 100. A student fails if any subject mark is below 35.</p>
+</section>
+<section id="results" class="results">
+<div class="section-heading"><div><p class="eyebrow">CLASS OVERVIEW</p><h2>Student results</h2></div><span class="count" th:text="${students.size()} + ' students'">0 students</span></div>
+<div th:if="${students.isEmpty()}" class="empty"><div>🗂️</div><h3>No student records yet</h3><p>Use the admin panel above to add the first student.</p></div>
+<div class="table-wrap" th:unless="${students.isEmpty()}"><table><thead><tr><th>Roll No.</th><th>Student</th><th>Subject 1</th><th>Subject 2</th><th>Subject 3</th><th>Total / 300</th><th>Average</th><th>Grade</th><th>Action</th></tr></thead>
+<tbody><tr th:each="s : ${students}"><td th:text="${s.rollNumber}"></td><td class="name" th:text="${s.name}"></td><td th:text="${#numbers.formatDecimal(s.subject1,1,2)}"></td><td th:text="${#numbers.formatDecimal(s.subject2,1,2)}"></td><td th:text="${#numbers.formatDecimal(s.subject3,1,2)}"></td><td class="total" th:text="${#numbers.formatDecimal(s.total,1,2)}"></td><td th:text="${#numbers.formatDecimal(s.average,1,2)} + '%'"></td><td><span class="grade" th:text="${s.grade}" th:classappend="${s.grade == 'F'} ? ' fail' : ' pass'"></span></td><td><form th:action="@{/admin/students/{id}/delete(id=${s.id})}" method="post" onsubmit="return confirm('Delete this student record?')"><button class="delete" type="submit">Delete</button></form></td></tr></tbody></table></div>
+</section>
+<section class="grade-info"><h3>Grade rules</h3><div class="grade-grid"><span><b>A+</b> 90–100</span><span><b>A</b> 75–89.99</span><span><b>B</b> 60–74.99</span><span><b>C</b> 45–59.99</span><span><b>D</b> 35–44.99</span><span><b>F</b> Below 35 in any subject</span></div></section>
+</main><footer>Student Marks Portal · College Project · Responsive for mobile and desktop</footer>
+</body></html>
